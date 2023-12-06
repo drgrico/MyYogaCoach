@@ -34,31 +34,32 @@
     <LinearLayout
         android:id="@+id/linear_layout_buttons"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="70dp"
         android:orientation="horizontal"
         android:gravity="center">
+
+
+        <Button
+            android:id="@+id/exercise_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Exercise"
+            android:layout_marginLeft="0dp"/>
 
         <Button
             android:id="@+id/start_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Start"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="30dp"/>
-
-        <!-- Aggiungi uno spaziatore flessibile per spingere il secondo pulsante a destra -->
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
 
         <Button
-            android:id="@+id/change_button"
+            android:id="@+id/camera_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="30dp"
-            android:text="Change" />
+            android:layout_marginRight="0dp"
+            android:text="Front" />
 
     </LinearLayout>
 

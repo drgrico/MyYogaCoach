@@ -65,7 +65,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private var cameraProvider: ProcessCameraProvider? = null
     private var cameraFacing = CameraSelector.LENS_FACING_BACK
 
-    private lateinit var changeButton: Button
+    private lateinit var cameraButton: Button
     private lateinit var startButton: Button
 
     /** Blocking ML operations are performed using this executor */
@@ -134,12 +134,14 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
         // Initialize our background executor
         backgroundExecutor = Executors.newSingleThreadExecutor()
 
-        changeButton = view.findViewById<Button>(R.id.change_button)
-        changeButton.setOnClickListener(View.OnClickListener {
-            cameraFacing = if (cameraFacing == CameraSelector.LENS_FACING_BACK) {
-                CameraSelector.LENS_FACING_FRONT
+        cameraButton = view.findViewById<Button>(R.id.camera_button)
+        cameraButton.setOnClickListener(View.OnClickListener {
+            if (cameraFacing == CameraSelector.LENS_FACING_BACK) {
+                cameraFacing = CameraSelector.LENS_FACING_FRONT
+                cameraButton.text = "Back"
             } else {
-                CameraSelector.LENS_FACING_BACK
+                cameraFacing = CameraSelector.LENS_FACING_BACK
+                cameraButton.text ="Front"
             }
             bindCameraUseCases()
         })
