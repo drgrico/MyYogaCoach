@@ -16,15 +16,21 @@
 package com.google.mediapipe.examples.poselandmarker.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -40,6 +46,7 @@ import com.google.mediapipe.examples.poselandmarker.PoseLandmarkerHelper
 import com.google.mediapipe.examples.poselandmarker.MainViewModel
 import com.google.mediapipe.examples.poselandmarker.R
 import com.google.mediapipe.examples.poselandmarker.databinding.FragmentCameraBinding
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.PoseList
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -57,6 +64,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private val fragmentCameraBinding
         get() = _fragmentCameraBinding!!
 
+    //pose detection and camera
     private lateinit var poseLandmarkerHelper: PoseLandmarkerHelper
     private val viewModel: MainViewModel by activityViewModels()
     private var preview: Preview? = null
@@ -65,8 +73,33 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private var cameraProvider: ProcessCameraProvider? = null
     private var cameraFacing = CameraSelector.LENS_FACING_BACK
 
+    //buttons
     private lateinit var cameraButton: Button
-    private lateinit var startButton: Button
+//    private lateinit var startButton: Button
+    private lateinit var poseButton: Button
+
+    //countdown events
+    private lateinit var countdownTextView: TextView
+    private lateinit var countdownTimer: CountDownTimer
+    private var isTimerActive = false
+
+    private val startSecondActivityForResult = registerForActivityResult<Intent, ActivityResult>(
+        ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            //obtain data from the second activity
+            val data = result.data!!.getStringExtra("selectedItemData")
+
+            //use the data
+            if (data != null) {
+                Toast.makeText(requireContext(), "Selected pose: ${data.uppercase()}!", Toast.LENGTH_SHORT).show()
+            }
+            //start the countdown
+            if (isTimerActive) {
+                countdownTimer.cancel()
+            }
+            startCountdown(7000, 1000)
+        }
+    }
 
     /** Blocking ML operations are performed using this executor */
     private lateinit var backgroundExecutor: ExecutorService
@@ -136,6 +169,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
         cameraButton = view.findViewById<Button>(R.id.camera_button)
         cameraButton.setOnClickListener(View.OnClickListener {
+            Log.d(TAG, "Camera button clicked")
             if (cameraFacing == CameraSelector.LENS_FACING_BACK) {
                 cameraFacing = CameraSelector.LENS_FACING_FRONT
                 cameraButton.text = "Back"
@@ -146,9 +180,17 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             bindCameraUseCases()
         })
 
-        startButton = view.findViewById(R.id.start_button)
-        startButton.setOnClickListener {
-                
+//        startButton = view.findViewById(R.id.start_button)
+//        startButton.setOnClickListener {
+//
+//        }
+
+        countdownTextView = view.findViewById(R.id.countdown_tv)
+        poseButton = view.findViewById(R.id.pose_button)
+        poseButton.setOnClickListener{
+            Log.d(TAG, "Pose button clicked")
+            val intent = Intent(requireContext(), PoseList::class.java)
+            startSecondActivityForResult.launch(intent)
         }
 
         // Wait for the views to be properly laid out
@@ -172,6 +214,34 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
         // Attach listeners to UI control widgets
         initBottomSheetControls()
+    }
+
+    private fun startCountdown(millisTot: Long, millisInterval: Long) {
+        countdownTimer = object : CountDownTimer(millisTot, millisInterval) {
+            override fun onTick(millisUntilFinished: Long) {
+                // Aggiorna l'UI con il tempo rimanente
+                val secondsRemaining = millisUntilFinished / 1000 + 1
+                if (secondsRemaining == millisTot/1000 || secondsRemaining == millisTot/1000 - 1) {
+                    countdownTextView.text = "GET READY!"
+                    isTimerActive = true
+                }
+                else {
+                    countdownTextView.text = "$secondsRemaining"
+                }
+            }
+
+            override fun onFinish() {
+                countdownTextView.text = "START!"
+                isTimerActive = false
+                object : CountDownTimer(1000, 1000) {
+                    override fun onTick(millisUntilFinished: Long) {}
+
+                    override fun onFinish() {
+                        countdownTextView.text = ""
+                    }
+                }.start()
+            }
+        }.start()
     }
 
     private fun initBottomSheetControls() {

@@ -16,6 +16,7 @@
 -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/camera_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -40,28 +41,40 @@
 
 
         <Button
-            android:id="@+id/exercise_button"
+            android:id="@+id/pose_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Exercise"
-            android:layout_marginLeft="0dp"/>
-
-        <Button
-            android:id="@+id/start_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
+            android:text="Pose"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="50dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:paddingHorizontal="25dp"/>
 
         <Button
             android:id="@+id/camera_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="0dp"
-            android:text="Front" />
+            android:layout_marginLeft="50dp"
+            android:text="Front"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingHorizontal="25dp"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/countdown_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="GET READY!"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="50sp"
+        android:textColor="@android:color/white"
+        />
 
     <include
         android:id="@+id/bottom_sheet_layout"
