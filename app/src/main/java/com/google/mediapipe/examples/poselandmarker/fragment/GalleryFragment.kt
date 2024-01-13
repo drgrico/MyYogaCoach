@@ -55,7 +55,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private val viewModel: MainViewModel by activityViewModels()
 
     /** Blocking ML operations are performed using this executor */
-    private lateinit var backgroundExecutor: ScheduledExecutorService
+    private val backgroundExecutor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
     private val getContent =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -85,6 +85,11 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             FragmentGalleryBinding.inflate(inflater, container, false)
 
         return fragmentGalleryBinding.root
+    }
+
+    override fun onDestroyView() {
+        backgroundExecutor.shutdown()
+        super.onDestroyView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -251,7 +256,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     // Load and display the image.
     private fun runDetectionOnImage(uri: Uri) {
         setUiEnabled(false)
-        backgroundExecutor = Executors.newSingleThreadScheduledExecutor()
+        //backgroundExecutor = Executors.newSingleThreadScheduledExecutor()
         updateDisplayView(MediaType.IMAGE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val source = ImageDecoder.createSource(
@@ -294,6 +299,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                             setUiEnabled(true)
                             fragmentGalleryBinding.bottomSheetLayout.inferenceTimeVal.text =
                                 String.format("%d ms", result.inferenceTime)
+                            onResults(result)
                         }
                     } ?: run { Log.e(TAG, "Error running pose landmarker.") }
 
@@ -313,7 +319,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             requestFocus()
         }
 
-        backgroundExecutor = Executors.newSingleThreadScheduledExecutor()
+        //backgroundExecutor = Executors.newSingleThreadScheduledExecutor()
         backgroundExecutor.execute {
 
             poseLandmarkerHelper =
@@ -442,7 +448,8 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     }
 
     override fun onResults(resultBundle: PoseLandmarkerHelper.ResultBundle) {
-        // no-op
+        Log.d(TAG, "Results: $resultBundle")
+        Log.d(TAG, "Results: ${resultBundle.toString()}")
     }
 
     companion object {
