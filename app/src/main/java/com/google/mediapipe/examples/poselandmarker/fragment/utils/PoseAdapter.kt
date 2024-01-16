@@ -52,5 +52,3 @@ class PoseAdapter(private val poses: List<Pose>) :
         return poses[position]
     }
 }
-
-data class Pose(val imageResource: Int, val name: String, val description: String)

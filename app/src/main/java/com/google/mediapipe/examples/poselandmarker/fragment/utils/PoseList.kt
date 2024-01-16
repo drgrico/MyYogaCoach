@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.security.AccessController.getContext
 import com.google.mediapipe.examples.poselandmarker.R
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.getPoseList
 
 
 class PoseList : AppCompatActivity() {
@@ -44,14 +45,5 @@ class PoseList : AppCompatActivity() {
 
             finish()
         }
-    }
-
-    private fun getPoseList(): List<Pose> {
-        val list: MutableList<Pose> = mutableListOf()
-
-        list.add(Pose(R.drawable.yoga_pose01, "SIMPLE", "Very simple pose"))
-        list.add(Pose(R.drawable.yoga_pose02, "HARD", "Very hard pose"))
-
-        return list
     }
 }

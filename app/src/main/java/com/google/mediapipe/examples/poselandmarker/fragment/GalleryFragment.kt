@@ -34,7 +34,10 @@ import androidx.fragment.app.activityViewModels
 import com.google.mediapipe.examples.poselandmarker.MainViewModel
 import com.google.mediapipe.examples.poselandmarker.PoseLandmarkerHelper
 import com.google.mediapipe.examples.poselandmarker.databinding.FragmentGalleryBinding
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.ChatGPT.createChatGPTInstance
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.ChatGPT.requestYogaAdvice
 import com.google.mediapipe.tasks.vision.core.RunningMode
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -83,6 +86,8 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     ): View {
         _fragmentGalleryBinding =
             FragmentGalleryBinding.inflate(inflater, container, false)
+
+        createChatGPTInstance(this.requireContext())
 
         return fragmentGalleryBinding.root
     }
@@ -450,6 +455,11 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     override fun onResults(resultBundle: PoseLandmarkerHelper.ResultBundle) {
         Log.d(TAG, "Results: $resultBundle")
         Log.d(TAG, "Results: ${resultBundle.toString()}")
+
+        var ctx = this.requireContext()
+        runBlocking {
+            requestYogaAdvice(ctx, "downward_facing_dog", resultBundle.toString())
+        }
     }
 
     companion object {

@@ -16,7 +16,7 @@
             android:id="@+id/poseImage"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:background="@drawable/item_pose_background"/>
     </androidx.cardview.widget.CardView>
 
