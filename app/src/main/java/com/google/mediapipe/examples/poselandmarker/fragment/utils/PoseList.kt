@@ -37,7 +37,8 @@ class PoseList : AppCompatActivity() {
         recyclerView.adapter = poseAdapter
 
         poseAdapter.setOnItemClickListener { view, position ->
-            val selectedItemData: String = poseAdapter.getItem(position).name
+//            val selectedItemData: String = poseAdapter.getItem(position).name
+            val selectedItemData: String = position.toString()
 
             val resultIntent = Intent()
             resultIntent.putExtra("selectedItemData", selectedItemData)

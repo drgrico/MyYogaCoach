@@ -15,6 +15,7 @@
  */
 package com.google.mediapipe.examples.poselandmarker.fragment
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -27,17 +28,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.mediapipe.examples.poselandmarker.MainViewModel
 import com.google.mediapipe.examples.poselandmarker.PoseLandmarkerHelper
+import com.google.mediapipe.examples.poselandmarker.R
 import com.google.mediapipe.examples.poselandmarker.databinding.FragmentGalleryBinding
 import com.google.mediapipe.examples.poselandmarker.fragment.utils.ChatGPT.createChatGPTInstance
 import com.google.mediapipe.examples.poselandmarker.fragment.utils.ChatGPT.requestYogaAdvice
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.PoseList
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.filterResult
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.getPoseName
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.loadCorrectLandmarks
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -56,6 +66,23 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
         get() = _fragmentGalleryBinding!!
     private lateinit var poseLandmarkerHelper: PoseLandmarkerHelper
     private val viewModel: MainViewModel by activityViewModels()
+
+    //pose list
+    private lateinit var poseButton: Button
+    private var poseSelected: String = ""
+    private val startSecondActivityForResult = registerForActivityResult<Intent, ActivityResult>(
+        ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            //obtain data from the second activity
+            val data = result.data!!.getStringExtra("selectedItemData")
+
+            //use the data
+            if (data != null) {
+                Toast.makeText(requireContext(), "Selected pose: ${getPoseName(data.toInt()).uppercase()}!", Toast.LENGTH_SHORT).show()
+                poseSelected = data
+            }
+        }
+    }
 
     /** Blocking ML operations are performed using this executor */
     private val backgroundExecutor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
@@ -88,6 +115,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             FragmentGalleryBinding.inflate(inflater, container, false)
 
         createChatGPTInstance(this.requireContext())
+        loadCorrectLandmarks(this.requireContext())
 
         return fragmentGalleryBinding.root
     }
@@ -100,7 +128,19 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fragmentGalleryBinding.fabGetContent.setOnClickListener {
-            getContent.launch(arrayOf("image/*", "video/*"))
+            if (poseSelected == "") {
+                Toast.makeText(requireContext(), "Select a pose!", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                getContent.launch(arrayOf("image/*", "video/*"))
+            }
+        }
+
+        poseButton = view.findViewById(R.id.pose_button)
+        poseButton.setOnClickListener{
+            Log.d(TAG, "Pose button clicked")
+            val intent = Intent(requireContext(), PoseList::class.java)
+            startSecondActivityForResult.launch(intent)
         }
 
         initBottomSheetControls()
@@ -454,11 +494,23 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
     override fun onResults(resultBundle: PoseLandmarkerHelper.ResultBundle) {
         Log.d(TAG, "Results: $resultBundle")
-        Log.d(TAG, "Results: ${resultBundle.toString()}")
 
-        var ctx = this.requireContext()
+        var res = filterResult(resultBundle)
+        Log.d(TAG, "FILTERED LANDMARKS: $res")
+
+//        Log.d(TAG, "Results: ${resultBundle.toString().subSequence(0, resultBundle.toString().length/3)}")
+//        Log.d(TAG, "Results: ${resultBundle.toString().subSequence(resultBundle.toString().length/3, resultBundle.toString().length/3 * 2)}")
+//        Log.d(TAG, "Results: ${resultBundle.toString().subSequence(resultBundle.toString().length/3 * 2, resultBundle.toString().length)}")
+
+
+        val ctx = this.requireContext()
         runBlocking {
-            requestYogaAdvice(ctx, "downward_facing_dog", resultBundle.toString())
+            if (poseSelected != "") {
+                requestYogaAdvice(ctx, poseSelected, res)
+            }
+            else {
+                Log.e(TAG, "No pose selected!")
+            }
         }
     }
 

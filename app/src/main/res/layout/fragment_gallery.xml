@@ -16,6 +16,7 @@
 -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -33,9 +34,10 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/bottom_sheet_peek_height"
+            tools:layout_editor_absoluteY="200dp"
             android:layout_marginTop="200dp"> <!--marginTop?-->
 
             <ImageView
@@ -69,6 +71,18 @@
                 android:visibility="gone" />
 
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/pose_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="16dp"
+            android:gravity="center"
+            android:paddingHorizontal="25dp"
+            android:text="Pose"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabGetContent"
