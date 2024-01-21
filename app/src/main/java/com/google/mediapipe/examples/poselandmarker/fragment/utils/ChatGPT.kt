@@ -138,7 +138,7 @@ object ChatGPT {
 //                Log.d(TAG, advice)
 
                 // Regex pattern that matches anything that's NOT a-z, A-Z, '.', '?' and ' ' (space).
-                val pattern = "[^a-zA-Z\\.\\?\\s\\'\\,]".toRegex()
+                val pattern = "[^a-zA-Z\\.\\?\\s\\'\\,\\;]".toRegex()
 
                 // Get the first mismatch index
                 val mismatchIndex = advice.indexOfFirst { it.toString().matches(pattern) }
