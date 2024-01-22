@@ -495,7 +495,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     override fun onResults(resultBundle: PoseLandmarkerHelper.ResultBundle) {
         Log.d(TAG, "Results: $resultBundle")
 
-        var res = filterResult(resultBundle)
+        val res = filterResult(resultBundle).toString()
         Log.d(TAG, "FILTERED LANDMARKS: $res")
 
 //        Log.d(TAG, "Results: ${resultBundle.toString().subSequence(0, resultBundle.toString().length/3)}")

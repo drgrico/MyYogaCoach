@@ -46,8 +46,16 @@ import com.google.mediapipe.examples.poselandmarker.PoseLandmarkerHelper
 import com.google.mediapipe.examples.poselandmarker.MainViewModel
 import com.google.mediapipe.examples.poselandmarker.R
 import com.google.mediapipe.examples.poselandmarker.databinding.FragmentCameraBinding
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.ChatGPT
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.ChatGPT.isPlayingAdvice
 import com.google.mediapipe.examples.poselandmarker.fragment.utils.PoseList
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.filterResult
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.getPoseName
+import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.isUserStatic
+import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import com.google.mediapipe.tasks.vision.core.RunningMode
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -56,7 +64,7 @@ import java.util.concurrent.TimeUnit
 class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
     companion object {
-        private const val TAG = "Pose Landmarker"
+        private const val TAG = "CameraFragment"
     }
 
     private var _fragmentCameraBinding: FragmentCameraBinding? = null
@@ -77,6 +85,11 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private lateinit var cameraButton: Button
 //    private lateinit var startButton: Button
     private lateinit var poseButton: Button
+    private var poseSelected: String = ""
+    private var cntDetection: Int = 0
+    private lateinit var poseRes1: List<NormalizedLandmark>
+    private lateinit var poseRes2: List<NormalizedLandmark>
+    private var threshold: Float = 0.3F
 
     //countdown events
     private lateinit var countdownTextView: TextView
@@ -91,13 +104,15 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
             //use the data
             if (data != null) {
-                Toast.makeText(requireContext(), "Selected pose: ${data.uppercase()}!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Selected pose: ${getPoseName(data.toInt()).uppercase()}!", Toast.LENGTH_SHORT).show()
+                poseSelected = data
+
+                //start the countdown
+                if (isTimerActive) {
+                    countdownTimer.cancel()
+                }
+                startCountdown(7000, 1000)
             }
-            //start the countdown
-            if (isTimerActive) {
-                countdownTimer.cancel()
-            }
-            startCountdown(7000, 1000)
         }
     }
 
@@ -156,6 +171,9 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     ): View {
         _fragmentCameraBinding =
             FragmentCameraBinding.inflate(inflater, container, false)
+
+        ChatGPT.createChatGPTInstance(this.requireContext())
+        Poses.loadCorrectLandmarks(this.requireContext())
 
         return fragmentCameraBinding.root
     }
@@ -219,7 +237,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private fun startCountdown(millisTot: Long, millisInterval: Long) {
         countdownTimer = object : CountDownTimer(millisTot, millisInterval) {
             override fun onTick(millisUntilFinished: Long) {
-                // Aggiorna l'UI con il tempo rimanente
+                // update UI with remaining time
                 val secondsRemaining = millisUntilFinished / 1000 + 1
                 if (secondsRemaining == millisTot/1000 || secondsRemaining == millisTot/1000 - 1) {
                     countdownTextView.text = "GET READY!"
@@ -233,6 +251,8 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             override fun onFinish() {
                 countdownTextView.text = "START!"
                 isTimerActive = false
+                cntDetection = 0
+
                 object : CountDownTimer(1000, 1000) {
                     override fun onTick(millisUntilFinished: Long) {}
 
@@ -482,6 +502,33 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                     resultBundle.inputImageWidth,
                     RunningMode.LIVE_STREAM
                 )
+
+                if (resultBundle.results.first().landmarks().flatten().isNotEmpty() && poseSelected.isNotEmpty() && !isTimerActive && !isPlayingAdvice()) {
+                    cntDetection += 1
+                    if (cntDetection % 25 == 0) { //to take the value every second
+                        val filteredRes = filterResult(resultBundle)
+//                        Log.d(TAG, filteredRes.toString())
+//                        Log.d(TAG, "Check x, y, z: ${filteredRes[0].x()}, ${filteredRes[0].y()}, ${filteredRes[0].z()}")
+                        Log.d(TAG, "Result bundle filtered: ${filteredRes.size}")
+
+                        if (cntDetection == 25) {
+                            poseRes1 = filteredRes
+                        }
+                        else if (cntDetection == 50) {
+                            poseRes2 = filteredRes
+                            if (isUserStatic(poseRes1, poseRes2, threshold)) {
+                                Log.d(TAG, "Sending request to ChatGPT")
+                                val ctx = this.requireContext()
+                                runBlocking {
+                                    ChatGPT.requestYogaAdvice(ctx, poseSelected, poseRes2.toString())
+                                }
+                            }
+                            cntDetection = 0
+                        }
+                    }
+
+                }
+
 
                 // Force a redraw
                 fragmentCameraBinding.overlay.invalidate()

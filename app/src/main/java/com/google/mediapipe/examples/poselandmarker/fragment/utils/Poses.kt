@@ -4,8 +4,10 @@ import android.content.Context
 import android.util.Log
 import com.google.mediapipe.examples.poselandmarker.PoseLandmarkerHelper
 import com.google.mediapipe.examples.poselandmarker.R
+import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import kotlin.math.pow
 
 object Poses {
     private const val TAG = "PoseData"
@@ -67,7 +69,7 @@ object Poses {
         return correctPoses[position]
     }
 
-    fun filterResult(result: PoseLandmarkerHelper.ResultBundle): String {
+    fun filterResult(result: PoseLandmarkerHelper.ResultBundle): List<NormalizedLandmark> {
         val relevantIndices = listOf(0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28)
 
         val allLandmarks = result.results.first().landmarks()
@@ -78,7 +80,36 @@ object Poses {
         }
 
         Log.d(TAG, "Filtered length: ${filteredLandmarks.size}")
-        return filteredLandmarks.toString()
+        return filteredLandmarks
+    }
+
+    fun isUserStatic(resultBundle1: List<NormalizedLandmark>, resultBundle2: List<NormalizedLandmark>, threshold: Float) : Boolean {
+        for (i in resultBundle1.indices) {
+            val landmark1 = resultBundle1[i]
+            val landmark2 = resultBundle2[i]
+
+            val relativeDifferences = FloatArray(3)
+            relativeDifferences[0] = if (landmark2.x() != 0f) kotlin.math.abs(landmark1.x() - landmark2.x()) / landmark2.x() else 0f
+            relativeDifferences[1] = if (landmark2.y() != 0f) kotlin.math.abs(landmark1.y() - landmark2.y()) / landmark2.y() else 0f
+            relativeDifferences[2] = if (landmark2.z() != 0f) kotlin.math.abs(landmark1.z() - landmark2.z()) / landmark2.z() else 0f
+
+            val standardDeviation = standardDeviation(relativeDifferences)
+            if (standardDeviation >= threshold) return false
+        }
+
+        // All differences were below the threshold, so the user is in a static position
+        return true
+    }
+
+    // Function to calculate standard deviation
+    private fun standardDeviation(floatArray: FloatArray): Float {
+        val avg = floatArray.average()
+        var sum = 0.0
+        for (num in floatArray) {
+            sum += (num - avg).pow(2.0)
+        }
+        val variance = sum / floatArray.size
+        return kotlin.math.sqrt(variance).toFloat()
     }
 }
 

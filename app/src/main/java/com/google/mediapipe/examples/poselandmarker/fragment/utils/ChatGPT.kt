@@ -77,15 +77,15 @@ object ChatGPT {
 
                 val correct = getCorrectLandmarks(pose.toInt()).split("world")[0]
                 val request = correct + "\nPose performed by the user: \n" + poseDetection.split("world")[0]
-                Log.d(TAG, "Correct pose $correct")
-                Log.d(TAG, "Sending request: $request")
+//                Log.d(TAG, "Correct pose $correct")
+//                Log.d(TAG, "Sending request: $request")
 
                 val assistant = chatGPTInstance.assistant(
                     request = AssistantRequest(
                         name = "Yoga Coach",
                         instructions = prompt,
                         tools = listOf(AssistantTool.CodeInterpreter),
-                        model = ModelId("gpt-4-1106-preview")
+                        model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
                     )
                 )
 
@@ -98,6 +98,7 @@ object ChatGPT {
                     )
                 )
 
+                Log.d(TAG, "Sending request...")
                 val run = chatGPTInstance.createRun(
                     thread.id,
                     request = RunRequest(
@@ -114,9 +115,9 @@ object ChatGPT {
                 val assistantMessages = chatGPTInstance.messages(thread.id)
                 var advice = ""
 //                for (message in assistantMessages) {
-                    val textContent = assistantMessages[0].content.first() as? MessageContent.Text ?: error("Expected MessageContent.Text")
-                    Log.d(TAG, "Assistant: ${textContent.text.value}")
-                    advice = textContent.text.value
+                val textContent = assistantMessages[0].content.first() as? MessageContent.Text ?: error("Expected MessageContent.Text")
+//                    Log.d(TAG, "Assistant: ${textContent.text.value}")
+                advice = textContent.text.value
 //                }
 
 //                val chatCompletionRequest = ChatCompletionRequest(
@@ -138,12 +139,13 @@ object ChatGPT {
 //                Log.d(TAG, advice)
 
                 // Regex pattern that matches anything that's NOT a-z, A-Z, '.', '?' and ' ' (space).
-                val pattern = "[^a-zA-Z\\.\\?\\s\\'\\,\\;]".toRegex()
-
-                // Get the first mismatch index
-                val mismatchIndex = advice.indexOfFirst { it.toString().matches(pattern) }
-
-                val processedAdvice = if (mismatchIndex != -1) advice.substring(0, mismatchIndex) else advice
+//                val pattern = "[^a-zA-Z\\.\\?\\s\\'\\,\\;]".toRegex()
+//
+//                // Get the first mismatch index
+//                val mismatchIndex = advice.indexOfFirst { it.toString().matches(pattern) }
+//
+//                val processedAdvice = if (mismatchIndex != -1) advice.substring(0, mismatchIndex) else advice
+                val processedAdvice = advice
 
                 Log.d(TAG, "Processed advice: $processedAdvice")
 
@@ -202,7 +204,7 @@ object ChatGPT {
             fos.write(mp3SoundByteArray)
             fos.close()
 
-            // resetting mediaplayer instance to evade problems
+            // resetting media-player instance to evade problems
             mediaPlayer.reset()
 
             // In case you run into issues with threading consider new instance like:
@@ -219,5 +221,9 @@ object ChatGPT {
             val s = ex.toString()
             ex.printStackTrace()
         }
+    }
+
+    fun isPlayingAdvice(): Boolean {
+        return mediaPlayer.isPlaying
     }
 }
