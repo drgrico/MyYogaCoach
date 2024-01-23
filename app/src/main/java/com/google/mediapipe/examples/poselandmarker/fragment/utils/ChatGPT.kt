@@ -4,6 +4,8 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import com.aallam.openai.api.BetaOpenAI
+import com.aallam.openai.api.assistant.Assistant
+import com.aallam.openai.api.assistant.AssistantId
 import com.aallam.openai.api.assistant.AssistantRequest
 import com.aallam.openai.api.assistant.AssistantTool
 import com.aallam.openai.api.audio.SpeechRequest
@@ -24,9 +26,11 @@ import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.getCorr
 import com.google.mediapipe.examples.poselandmarker.fragment.utils.Poses.getPoseName
 import kotlinx.coroutines.delay
 import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.FileWriter
 import java.io.IOException
 import java.io.InputStreamReader
 import kotlin.time.Duration
@@ -38,6 +42,7 @@ object ChatGPT {
     private lateinit var chatGPTInstance: OpenAI
     private lateinit var prompt: String
     private lateinit var apiKey: String
+    private lateinit var assistant_id: String
     private val mediaPlayer = MediaPlayer()
 
     fun createChatGPTInstance(ctx: Context) {
@@ -60,6 +65,18 @@ object ChatGPT {
 
         prompt = getPrompt(ctx)
         Log.d(TAG, prompt)
+
+        try {
+            val inputStream = ctx.assets.open("assistant_id.txt")
+            val reader = BufferedReader(InputStreamReader(inputStream))
+
+            assistant_id = reader.readLine()
+
+            reader.close()
+            inputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @OptIn(BetaOpenAI::class)
@@ -80,14 +97,54 @@ object ChatGPT {
 //                Log.d(TAG, "Correct pose $correct")
 //                Log.d(TAG, "Sending request: $request")
 
-                val assistant = chatGPTInstance.assistant(
-                    request = AssistantRequest(
-                        name = "Yoga Coach",
-                        instructions = prompt,
-                        tools = listOf(AssistantTool.CodeInterpreter),
-                        model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
+                val assistant: Assistant
+                if (assistant_id.isBlank()) {
+                    Log.d(TAG, "Creating new Assistant...")
+                    assistant = chatGPTInstance.assistant(
+                        request = AssistantRequest(
+                            name = "Yoga Coach",
+                            instructions = prompt,
+                            tools = listOf(AssistantTool.CodeInterpreter),
+                            model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
+                        )
                     )
-                )
+                    try {
+                        FileWriter("assistant_id.txt").use { fileWriter ->
+                            BufferedWriter(fileWriter).use { bufferedWriter ->
+                                bufferedWriter.write(assistant.id.toString())
+                            }
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+                else {
+                    Log.d(TAG, "Found an existing assistant.")
+                    val assist = chatGPTInstance.assistant(id = AssistantId(assistant_id))
+                    if (assist == null) {
+                        Log.d(TAG, "Problem with the assistant id. Creating new Assistant...")
+                        assistant = chatGPTInstance.assistant(
+                            request = AssistantRequest(
+                                name = "Yoga Coach",
+                                instructions = prompt,
+                                tools = listOf(AssistantTool.CodeInterpreter),
+                                model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
+                            )
+                        )
+                        try {
+                            FileWriter("assistant_id.txt").use { fileWriter ->
+                                BufferedWriter(fileWriter).use { bufferedWriter ->
+                                    bufferedWriter.write(assistant.id.toString())
+                                }
+                            }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    else {
+                        assistant = assist
+                    }
+                }
 
                 val thread = chatGPTInstance.thread()
                 chatGPTInstance.message(

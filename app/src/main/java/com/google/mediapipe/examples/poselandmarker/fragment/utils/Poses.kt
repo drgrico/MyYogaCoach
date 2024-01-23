@@ -36,7 +36,7 @@ object Poses {
 
     fun loadCorrectLandmarks(ctx: Context) {
         for (pose in list) {
-            var landmarks = StringBuilder()
+            val landmarks = StringBuilder()
 
             try {
                 val inputStream = ctx.assets.open("${pose.name}.txt")
