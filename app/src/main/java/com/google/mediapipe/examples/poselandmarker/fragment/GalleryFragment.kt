@@ -157,120 +157,120 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
     private fun initBottomSheetControls() {
         // init bottom sheet settings
-        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinPoseDetectionConfidence
-            )
-        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinPoseTrackingConfidence
-            )
-        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinPosePresenceConfidence
-            )
-
-        // When clicked, lower detection score threshold floor
-        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdMinus.setOnClickListener {
-            if (viewModel.currentMinPoseDetectionConfidence >= 0.2) {
-                viewModel.setMinPoseDetectionConfidence(viewModel.currentMinPoseDetectionConfidence - 0.1f)
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise detection score threshold floor
-        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdPlus.setOnClickListener {
-            if (viewModel.currentMinPoseDetectionConfidence <= 0.8) {
-                viewModel.setMinPoseDetectionConfidence(viewModel.currentMinPoseDetectionConfidence + 0.1f)
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, lower pose tracking score threshold floor
-        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdMinus.setOnClickListener {
-            if (viewModel.currentMinPoseTrackingConfidence >= 0.2) {
-                viewModel.setMinPoseTrackingConfidence(
-                    viewModel.currentMinPoseTrackingConfidence - 0.1f
-                )
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise pose tracking score threshold floor
-        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdPlus.setOnClickListener {
-            if (viewModel.currentMinPoseTrackingConfidence <= 0.8) {
-                viewModel.setMinPoseTrackingConfidence(
-                    viewModel.currentMinPoseTrackingConfidence + 0.1f
-                )
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, lower pose presence score threshold floor
-        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdMinus.setOnClickListener {
-            if (viewModel.currentMinPosePresenceConfidence >= 0.2) {
-                viewModel.setMinPosePresenceConfidence(
-                    viewModel.currentMinPosePresenceConfidence - 0.1f
-                )
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise pose presence score threshold floor
-        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdPlus.setOnClickListener {
-            if (viewModel.currentMinPosePresenceConfidence <= 0.8) {
-                viewModel.setMinPosePresenceConfidence(
-                    viewModel.currentMinPosePresenceConfidence + 0.1f
-                )
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, change the underlying hardware used for inference. Current options are CPU
-        // GPU, and NNAPI
-        fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.setSelection(
-            viewModel.currentDelegate,
-            false
-        )
-        fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    p0: AdapterView<*>?,
-                    p1: View?,
-                    p2: Int,
-                    p3: Long
-                ) {
-
-                    viewModel.setDelegate(p2)
-                    updateControlsUi()
-                }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-                    /* no op */
-                }
-            }
-
-        // When clicked, change the underlying model used for object detection
-        fragmentGalleryBinding.bottomSheetLayout.spinnerModel.setSelection(
-            viewModel.currentModel,
-            false
-        )
-        fragmentGalleryBinding.bottomSheetLayout.spinnerModel.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    p0: AdapterView<*>?,
-                    p1: View?,
-                    p2: Int,
-                    p3: Long
-                ) {
-                    poseLandmarkerHelper.currentModel = p2
-                    updateControlsUi()
-                }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-                    /* no op */
-                }
-            }
+//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdValue.text =
+//            String.format(
+//                Locale.US, "%.2f", viewModel.currentMinPoseDetectionConfidence
+//            )
+//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdValue.text =
+//            String.format(
+//                Locale.US, "%.2f", viewModel.currentMinPoseTrackingConfidence
+//            )
+//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdValue.text =
+//            String.format(
+//                Locale.US, "%.2f", viewModel.currentMinPosePresenceConfidence
+//            )
+//
+//        // When clicked, lower detection score threshold floor
+//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdMinus.setOnClickListener {
+//            if (viewModel.currentMinPoseDetectionConfidence >= 0.2) {
+//                viewModel.setMinPoseDetectionConfidence(viewModel.currentMinPoseDetectionConfidence - 0.1f)
+//                updateControlsUi()
+//            }
+//        }
+//
+//        // When clicked, raise detection score threshold floor
+//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdPlus.setOnClickListener {
+//            if (viewModel.currentMinPoseDetectionConfidence <= 0.8) {
+//                viewModel.setMinPoseDetectionConfidence(viewModel.currentMinPoseDetectionConfidence + 0.1f)
+//                updateControlsUi()
+//            }
+//        }
+//
+//        // When clicked, lower pose tracking score threshold floor
+//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdMinus.setOnClickListener {
+//            if (viewModel.currentMinPoseTrackingConfidence >= 0.2) {
+//                viewModel.setMinPoseTrackingConfidence(
+//                    viewModel.currentMinPoseTrackingConfidence - 0.1f
+//                )
+//                updateControlsUi()
+//            }
+//        }
+//
+//        // When clicked, raise pose tracking score threshold floor
+//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdPlus.setOnClickListener {
+//            if (viewModel.currentMinPoseTrackingConfidence <= 0.8) {
+//                viewModel.setMinPoseTrackingConfidence(
+//                    viewModel.currentMinPoseTrackingConfidence + 0.1f
+//                )
+//                updateControlsUi()
+//            }
+//        }
+//
+//        // When clicked, lower pose presence score threshold floor
+//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdMinus.setOnClickListener {
+//            if (viewModel.currentMinPosePresenceConfidence >= 0.2) {
+//                viewModel.setMinPosePresenceConfidence(
+//                    viewModel.currentMinPosePresenceConfidence - 0.1f
+//                )
+//                updateControlsUi()
+//            }
+//        }
+//
+//        // When clicked, raise pose presence score threshold floor
+//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdPlus.setOnClickListener {
+//            if (viewModel.currentMinPosePresenceConfidence <= 0.8) {
+//                viewModel.setMinPosePresenceConfidence(
+//                    viewModel.currentMinPosePresenceConfidence + 0.1f
+//                )
+//                updateControlsUi()
+//            }
+//        }
+//
+//        // When clicked, change the underlying hardware used for inference. Current options are CPU
+//        // GPU, and NNAPI
+//        fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.setSelection(
+//            viewModel.currentDelegate,
+//            false
+//        )
+//        fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.onItemSelectedListener =
+//            object : AdapterView.OnItemSelectedListener {
+//                override fun onItemSelected(
+//                    p0: AdapterView<*>?,
+//                    p1: View?,
+//                    p2: Int,
+//                    p3: Long
+//                ) {
+//
+//                    viewModel.setDelegate(p2)
+//                    updateControlsUi()
+//                }
+//
+//                override fun onNothingSelected(p0: AdapterView<*>?) {
+//                    /* no op */
+//                }
+//            }
+//
+//        // When clicked, change the underlying model used for object detection
+//        fragmentGalleryBinding.bottomSheetLayout.spinnerModel.setSelection(
+//            viewModel.currentModel,
+//            false
+//        )
+//        fragmentGalleryBinding.bottomSheetLayout.spinnerModel.onItemSelectedListener =
+//            object : AdapterView.OnItemSelectedListener {
+//                override fun onItemSelected(
+//                    p0: AdapterView<*>?,
+//                    p1: View?,
+//                    p2: Int,
+//                    p3: Long
+//                ) {
+//                    poseLandmarkerHelper.currentModel = p2
+//                    updateControlsUi()
+//                }
+//
+//                override fun onNothingSelected(p0: AdapterView<*>?) {
+//                    /* no op */
+//                }
+//            }
     }
 
     // Update the values displayed in the bottom sheet. Reset detector.
@@ -281,18 +281,18 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
         fragmentGalleryBinding.videoView.visibility = View.GONE
         fragmentGalleryBinding.imageResult.visibility = View.GONE
         fragmentGalleryBinding.overlay.clear()
-        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinPoseDetectionConfidence
-            )
-        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinPoseTrackingConfidence
-            )
-        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinPosePresenceConfidence
-            )
+//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdValue.text =
+//            String.format(
+//                Locale.US, "%.2f", viewModel.currentMinPoseDetectionConfidence
+//            )
+//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdValue.text =
+//            String.format(
+//                Locale.US, "%.2f", viewModel.currentMinPoseTrackingConfidence
+//            )
+//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdValue.text =
+//            String.format(
+//                Locale.US, "%.2f", viewModel.currentMinPosePresenceConfidence
+//            )
 
         fragmentGalleryBinding.overlay.clear()
         fragmentGalleryBinding.tvPlaceholder.visibility = View.VISIBLE
@@ -342,8 +342,8 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                             )
 
                             setUiEnabled(true)
-                            fragmentGalleryBinding.bottomSheetLayout.inferenceTimeVal.text =
-                                String.format("%d ms", result.inferenceTime)
+//                            fragmentGalleryBinding.bottomSheetLayout.inferenceTimeVal.text =
+//                                String.format("%d ms", result.inferenceTime)
                             onResults(result)
                         }
                     } ?: run { Log.e(TAG, "Error running pose landmarker.") }
@@ -422,8 +422,8 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
                         setUiEnabled(true)
 
-                        fragmentGalleryBinding.bottomSheetLayout.inferenceTimeVal.text =
-                            String.format("%d ms", result.inferenceTime)
+//                        fragmentGalleryBinding.bottomSheetLayout.inferenceTimeVal.text =
+//                            String.format("%d ms", result.inferenceTime)
                     }
                 }
             },
@@ -455,20 +455,20 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
     private fun setUiEnabled(enabled: Boolean) {
         fragmentGalleryBinding.fabGetContent.isEnabled = enabled
-        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdMinus.isEnabled =
-            enabled
-        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdPlus.isEnabled =
-            enabled
-        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdMinus.isEnabled =
-            enabled
-        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdPlus.isEnabled =
-            enabled
-        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdMinus.isEnabled =
-            enabled
-        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdPlus.isEnabled =
-            enabled
-        fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.isEnabled =
-            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdMinus.isEnabled =
+//            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.detectionThresholdPlus.isEnabled =
+//            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdMinus.isEnabled =
+//            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.trackingThresholdPlus.isEnabled =
+//            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdMinus.isEnabled =
+//            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.presenceThresholdPlus.isEnabled =
+//            enabled
+//        fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.isEnabled =
+//            enabled
     }
 
     private fun classifyingError() {
@@ -483,12 +483,12 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
         classifyingError()
         activity?.runOnUiThread {
             Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
-            if (errorCode == PoseLandmarkerHelper.GPU_ERROR) {
-                fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.setSelection(
-                    PoseLandmarkerHelper.DELEGATE_CPU,
-                    false
-                )
-            }
+//            if (errorCode == PoseLandmarkerHelper.GPU_ERROR) {
+//                fragmentGalleryBinding.bottomSheetLayout.spinnerDelegate.setSelection(
+//                    PoseLandmarkerHelper.DELEGATE_CPU,
+//                    false
+//                )
+//            }
         }
     }
 

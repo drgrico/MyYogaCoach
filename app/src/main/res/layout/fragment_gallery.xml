@@ -57,8 +57,7 @@
             <com.google.mediapipe.examples.poselandmarker.OverlayView
                 android:id="@+id/overlay"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true" />
+                android:layout_height="match_parent" />
 
             <androidx.core.widget.ContentLoadingProgressBar
                 android:id="@+id/progress"
@@ -71,6 +70,13 @@
                 android:visibility="gone" />
 
         </RelativeLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <Button
             android:id="@+id/pose_button"
@@ -96,9 +102,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:tint="@android:color/white" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include
-        android:id="@+id/bottom_sheet_layout"
-        layout="@layout/info_bottom_sheet" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
