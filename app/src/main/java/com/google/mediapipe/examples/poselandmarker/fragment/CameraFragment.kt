@@ -16,6 +16,7 @@
 package com.google.mediapipe.examples.poselandmarker.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -89,7 +90,8 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private var cntDetection: Int = 0
     private lateinit var poseRes1: List<NormalizedLandmark>
     private lateinit var poseRes2: List<NormalizedLandmark>
-    private var threshold: Float = 0.3F
+    private var userStatic = false
+    private var threshold: Float = 0.6F
     private lateinit var instructionsTextView: TextView
     private lateinit var poseNameButton: Button
 
@@ -192,12 +194,10 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
         cameraButton = view.findViewById<Button>(R.id.camera_button)
         cameraButton.setOnClickListener(View.OnClickListener {
             Log.d(TAG, "Camera button clicked")
-            if (cameraFacing == CameraSelector.LENS_FACING_BACK) {
-                cameraFacing = CameraSelector.LENS_FACING_FRONT
-                cameraButton.text = "Back"
+            cameraFacing = if (cameraFacing == CameraSelector.LENS_FACING_BACK) {
+                CameraSelector.LENS_FACING_FRONT
             } else {
-                cameraFacing = CameraSelector.LENS_FACING_BACK
-                cameraButton.text ="Front"
+                CameraSelector.LENS_FACING_BACK
             }
             bindCameraUseCases()
         })
@@ -515,6 +515,10 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                 )
 
                 if (resultBundle.results.first().landmarks().flatten().isNotEmpty() && poseSelected.isNotEmpty() && !isTimerActive && !isPlayingAdvice()) {
+                    if (userStatic) {
+                        sendRequest(requireContext())
+                    }
+
                     cntDetection += 1
                     if (cntDetection % 25 == 0) { //to take the value every second
                         val filteredRes = filterResult(resultBundle)
@@ -527,19 +531,10 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                         }
                         else if (cntDetection == 50) {
                             poseRes2 = filteredRes
-
-                            instructionsTextView.text = "Analysis..."
-
                             if (isUserStatic(poseRes1, poseRes2, threshold)) {
-                                Log.d(TAG, "Sending request to ChatGPT")
-                                val ctx = this.requireContext()
-                                runBlocking {
-                                    ChatGPT.requestYogaAdvice(ctx, poseSelected, poseRes2.toString())
-                                }
+                                instructionsTextView.text = "Wait..."
+                                userStatic = true
                             }
-
-                            instructionsTextView.text = "Pose!"
-
                             cntDetection = 0
                         }
                     }
@@ -551,6 +546,15 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                 fragmentCameraBinding.overlay.invalidate()
             }
         }
+    }
+
+    private fun sendRequest(ctx: Context) {
+        Log.d(TAG, "Sending request to ChatGPT")
+        runBlocking {
+            ChatGPT.requestYogaAdvice(ctx, poseSelected, poseRes2.toString())
+        }
+        userStatic = false
+        instructionsTextView.text = "Pose!"
     }
 
     override fun onError(error: String, errorCode: Int) {

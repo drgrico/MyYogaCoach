@@ -70,6 +70,8 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     //pose list
     private lateinit var poseButton: Button
     private var poseSelected: String = ""
+    private lateinit var poseNameButton: Button
+
     private val startSecondActivityForResult = registerForActivityResult<Intent, ActivityResult>(
         ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
@@ -80,6 +82,8 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             if (data != null) {
                 Toast.makeText(requireContext(), "Selected pose: ${getPoseName(data.toInt()).uppercase()}!", Toast.LENGTH_SHORT).show()
                 poseSelected = data
+                poseNameButton.text = getPoseName(data.toInt())
+                poseNameButton.visibility = View.VISIBLE
             }
         }
     }
@@ -137,6 +141,7 @@ class GalleryFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
         }
 
         poseButton = view.findViewById(R.id.pose_button)
+        poseNameButton = view.findViewById(R.id.posename_button)
         poseButton.setOnClickListener{
             Log.d(TAG, "Pose button clicked")
             val intent = Intent(requireContext(), PoseList::class.java)

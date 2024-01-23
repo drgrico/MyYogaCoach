@@ -20,6 +20,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/posename_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Mountain Pose"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="725dp"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="5dp"
+        android:visibility="invisible"
+        android:clickable="false"
+        android:background="@drawable/rounded_button"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
