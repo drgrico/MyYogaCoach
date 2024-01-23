@@ -120,30 +120,38 @@ object ChatGPT {
                 }
                 else {
                     Log.d(TAG, "Found an existing assistant.")
-                    val assist = chatGPTInstance.assistant(id = AssistantId(assistant_id))
-                    if (assist == null) {
-                        Log.d(TAG, "Problem with the assistant id. Creating new Assistant...")
-                        assistant = chatGPTInstance.assistant(
-                            request = AssistantRequest(
-                                name = "Yoga Coach",
-                                instructions = prompt,
-                                tools = listOf(AssistantTool.CodeInterpreter),
-                                model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
-                            )
+//                    val assist = chatGPTInstance.assistant(id = AssistantId(assistant_id),
+                    assistant = chatGPTInstance.assistant(id = AssistantId(assistant_id),
+                        request = AssistantRequest(
+                            name = "Yoga Coach",
+                            instructions = prompt,
+                            tools = listOf(AssistantTool.CodeInterpreter),
+                            model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
                         )
-                        try {
-                            FileWriter("assistant_id.txt").use { fileWriter ->
-                                BufferedWriter(fileWriter).use { bufferedWriter ->
-                                    bufferedWriter.write(assistant.id.toString())
-                                }
-                            }
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    else {
-                        assistant = assist
-                    }
+                    )
+//                    if (assist == null) {
+//                        Log.d(TAG, "Problem with the assistant id. Creating new Assistant...")
+//                        assistant = chatGPTInstance.assistant(
+//                            request = AssistantRequest(
+//                                name = "Yoga Coach",
+//                                instructions = prompt,
+//                                tools = listOf(AssistantTool.CodeInterpreter),
+//                                model = ModelId("gpt-3.5-turbo") //gpt-4-1106-preview
+//                            )
+//                        )
+//                        try {
+//                            FileWriter("assistant_id.txt").use { fileWriter ->
+//                                BufferedWriter(fileWriter).use { bufferedWriter ->
+//                                    bufferedWriter.write(assistant.id.toString())
+//                                }
+//                            }
+//                        } catch (e: IOException) {
+//                            e.printStackTrace()
+//                        }
+//                    }
+//                    else {
+//                        assistant = assist
+//                    }
                 }
 
                 val thread = chatGPTInstance.thread()

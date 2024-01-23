@@ -79,7 +79,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private var cameraFacing = CameraSelector.LENS_FACING_BACK
+    private var cameraFacing = CameraSelector.LENS_FACING_FRONT
 
     //buttons
     private lateinit var cameraButton: Button
@@ -90,6 +90,8 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
     private lateinit var poseRes1: List<NormalizedLandmark>
     private lateinit var poseRes2: List<NormalizedLandmark>
     private var threshold: Float = 0.3F
+    private lateinit var instructionsTextView: TextView
+    private lateinit var poseNameButton: Button
 
     //countdown events
     private lateinit var countdownTextView: TextView
@@ -106,6 +108,8 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
             if (data != null) {
                 Toast.makeText(requireContext(), "Selected pose: ${getPoseName(data.toInt()).uppercase()}!", Toast.LENGTH_SHORT).show()
                 poseSelected = data
+                poseNameButton.text = getPoseName(data.toInt())
+                poseNameButton.visibility = View.VISIBLE
 
                 //start the countdown
                 if (isTimerActive) {
@@ -203,7 +207,11 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 //
 //        }
 
+        instructionsTextView = view.findViewById(R.id.instructions_tv)
+        poseNameButton = view.findViewById(R.id.posename_button)
         countdownTextView = view.findViewById(R.id.countdown_tv)
+        countdownTextView.text = "Select a pose!"
+
         poseButton = view.findViewById(R.id.pose_button)
         poseButton.setOnClickListener{
             Log.d(TAG, "Pose button clicked")
@@ -242,6 +250,8 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                 if (secondsRemaining == millisTot/1000 || secondsRemaining == millisTot/1000 - 1) {
                     countdownTextView.text = "GET READY!"
                     isTimerActive = true
+
+                    instructionsTextView.text = ""
                 }
                 else {
                     countdownTextView.text = "$secondsRemaining"
@@ -258,6 +268,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
 
                     override fun onFinish() {
                         countdownTextView.text = ""
+                        instructionsTextView.text = "Pose!"
                     }
                 }.start()
             }
@@ -516,6 +527,9 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                         }
                         else if (cntDetection == 50) {
                             poseRes2 = filteredRes
+
+                            instructionsTextView.text = "Analysis..."
+
                             if (isUserStatic(poseRes1, poseRes2, threshold)) {
                                 Log.d(TAG, "Sending request to ChatGPT")
                                 val ctx = this.requireContext()
@@ -523,6 +537,9 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.LandmarkerListener {
                                     ChatGPT.requestYogaAdvice(ctx, poseSelected, poseRes2.toString())
                                 }
                             }
+
+                            instructionsTextView.text = "Pose!"
+
                             cntDetection = 0
                         }
                     }

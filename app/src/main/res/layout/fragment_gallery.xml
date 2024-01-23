@@ -86,7 +86,7 @@
             android:layout_margin="16dp"
             android:gravity="center"
             android:paddingHorizontal="25dp"
-            android:text="Pose"
+            android:text="Select Pose"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

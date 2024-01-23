@@ -44,7 +44,7 @@
             android:id="@+id/pose_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pose"
+            android:text="Select Pose"
             android:layout_marginLeft="0dp"
             android:layout_marginRight="50dp"
             android:gravity="center"
@@ -57,12 +57,23 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="0dp"
             android:layout_marginLeft="50dp"
-            android:text="Front"
+            android:text="Back"
             android:layout_gravity="center"
             android:gravity="center"
             android:paddingHorizontal="25dp"/>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/posename_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Mountain Pose"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="650dp"
+        android:paddingHorizontal="25dp"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/countdown_tv"
@@ -72,6 +83,18 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textStyle="bold"
+        android:textSize="50sp"
+        android:textColor="@android:color/white"
+        />
+
+    <TextView
+        android:id="@+id/instructions_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Pose!"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="650sp"
         android:textSize="50sp"
         android:textColor="@android:color/white"
         />
