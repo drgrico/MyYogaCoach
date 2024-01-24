@@ -45,7 +45,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/tv_gallery_placeholder"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="25sp"/>
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
